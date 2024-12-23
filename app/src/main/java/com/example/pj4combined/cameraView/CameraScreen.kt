@@ -120,17 +120,21 @@ fun CameraScreen() {
             Log.d("CS330", "GPU too slow, switching to CPU start")
             // TODO:
             //  Create new classifier to be run on CPU with 2 threads
-            val cameraExecutorCPU = remember { Executors.newSingleThreadExecutor() }
-            val personClassifierCPU = PersonClassifier()
-            personClassifierCPU.initialize(context, useGPU = false, threadNumber = 2)
-            personClassifierCPU.setDetectorListener(listener)
-            // TODO:
-            //  Set imageAnalyzer to use the new classifier
-            imageAnalyzer.clearAnalyzer()
-            imageAnalyzer.setAnalyzer(cameraExecutorCPU) { image ->
-            detectObjects(image, personClassifierCPU)
-            // close image proxy
-            image.close()
+            val hasSwitched = remember { mutableStateOf(false) }
+            if (!hasSwitched.value){
+                hasSwitched.value = true
+                val cameraExecutorCPU = remember { Executors.newSingleThreadExecutor() }
+                val personClassifierCPU = PersonClassifier()
+                personClassifierCPU.initialize(context, useGPU = false, threadNumber = 2)
+                personClassifierCPU.setDetectorListener(listener)
+                // TODO:
+                //  Set imageAnalyzer to use the new classifier
+                imageAnalyzer.clearAnalyzer()
+                imageAnalyzer.setAnalyzer(cameraExecutorCPU) { image ->
+                    detectObjects(image, personClassifierCPU)
+                    // close image proxy
+                    image.close()
+                }
             }
             Log.d("CS330", "GPU too slow, switching to CPU done")
         }
