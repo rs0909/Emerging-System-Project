@@ -106,6 +106,7 @@ fun CameraScreen() {
         // TODO:
         //  Choose your inference time threshold
         val inferenceTimeThreshold = 400
+        val hasSwitched = remember { mutableStateOf(false) }
         val totalInferenceTime = remember { mutableStateOf(0L) }
         val inferenceCount = remember { mutableStateOf(0) }
         val averageInferenceTime = remember { mutableStateOf(0L) }
@@ -119,10 +120,10 @@ fun CameraScreen() {
         if (detectionResults.value!!.inferenceTime > inferenceTimeThreshold) {
             Log.d("CS330", "GPU too slow, switching to CPU start")
             // TODO:
-            //  Create new classifier to be run on CPU with 2 threads
-            val hasSwitched = remember { mutableStateOf(false) }
+            //  Create new classifier to be run on CPU with 2 thread
             if (!hasSwitched.value){
                 hasSwitched.value = true
+                Log.d("CS330", "Entered")
                 val cameraExecutorCPU = remember { Executors.newSingleThreadExecutor() }
                 val personClassifierCPU = PersonClassifier()
                 personClassifierCPU.initialize(context, useGPU = false, threadNumber = 2)
@@ -137,6 +138,7 @@ fun CameraScreen() {
                 }
             }
             Log.d("CS330", "GPU too slow, switching to CPU done")
+
         }
     }
 
